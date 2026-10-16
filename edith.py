@@ -25,7 +25,7 @@ async def chat_with_edith(request: UserRequest):
             raise HTTPException(status_code=400, detail="Metin boş olamaz.")
 
         completion = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.3-70b-specdec",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": request.text}
