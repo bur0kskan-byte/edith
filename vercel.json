@@ -1,3 +1,14 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/edith.py" }]
+  "builds": [
+    {
+      "src": "edith.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "edith.py"
+    }
+  ]
 }
