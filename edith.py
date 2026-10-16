@@ -5,8 +5,7 @@ from groq import Groq
 
 app = FastAPI(title="EDITH Voice Backend")
 
-# Groq API Client
-# GROQ_API_KEY ortam değişkeninden okunur
+# Groq Client (API Key Vercel Ortam Değişkeninden okunur)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 class UserRequest(BaseModel):
