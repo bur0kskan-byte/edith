@@ -1,45 +1,35 @@
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from pydantic import BaseModel
 from groq import Groq
 
-app = FastAPI(title="EDITH Voice Backend")
+app = FastAPI()
 
-# Groq Client (API Key Vercel Ortam Değişkeninden okunur)
+# Groq İstemcisi - API Key'i doğrudan Vercel ortamından alır
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
-class UserRequest(BaseModel):
+class ChatRequest(BaseModel):
     text: str
 
-SYSTEM_PROMPT = (
-    "Sen EDITH'sin. Kullanıcının mutlak patronusun. "
-    "Her zaman 'Efendim Patron' veya 'Patron' diyerek konuş. "
-    "Sadece Türkçe yanıt ver. Yıldız, kare gibi işaretler veya emoji KULLANMA. "
-    "Yanıtların sesli okunacağı için kısa, net ve karizmatik olsun."
-)
+@app.get("/")
+def home():
+    return {"status": "EDITH Sistemleri Aktif, Patron!"}
 
 @app.post("/chat")
-async def chat_with_edith(request: UserRequest):
+def chat(request: ChatRequest):
     try:
-        if not request.text.strip():
-            raise HTTPException(status_code=400, detail="Metin boş olamaz.")
-
         completion = client.chat.completions.create(
+            # Groq'un en kararlı ve hızlı modeli
             model="llama-3.1-8b-instant",
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": "Sen EDITH adında yardımcı bir AI asistanısın. Kısa ve net Türkçe cevaplar ver."},
                 {"role": "user", "content": request.text}
             ],
             temperature=0.7,
             max_tokens=250
         )
-        
-        reply = completion.choices[0].message.content
-        return {"reply": reply}
-
+        reply_text = completion.choices[0].message.content
+        return {"reply": reply_text}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/")
-def health_check():
-    return {"status": "EDITH Sistemleri Aktif, Patron!"}
+        # Hata durumunda Kestirme'ye hatayı açıkça iletir
+        return {"reply": f"Groq Hatası: {str(e)}"}
